@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Stalk your friends</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/fb.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div class="container">
+      <div class="app row">
+        <div class="span12">
+          <h2 class="app-heading">Stalk your friends</h2>
+          <!-- btn-group, see: http://twitter.github.com/bootstrap/components.html#buttonGroups -->
+          <div class="span12 app-toolbar btn-group input-prepend input-append">
+            <span class="add-on"><i class="icon-search"></i></span>
+            <input type="text" id="search" class=" appendedPrependedInput" placeholder="Rechercher vos amis..."></input>
+            <button class="btn" id="byName">Sort by name</button>
+            <button class="btn" id="byBirthday">Sort by birthday</button>
+            <button class="btn" id="byPresence">Sort by presence</button>
+            <button class="btn btn-inverse" id="statistics" onclick="hide();">Show/Hide charts</button>
+          </div>
+          <div id="btnCharts" =class="app-toolbar btn-group input-prepend input-append">
+              <button class="btn" type="button" id="chartByRelationShip">Relationship chart</button>
+              <button class="btn" type="button" id="chartBySex">Sex chart</button>
+              <button class="btn" type="button" id="chartByAge">Age chart</button>
+               <button class="btn" type="button" id="chartByCountry">Country chart</button>
+          </div>
+          <div class='chart' id="chart">
+          </div>
+          <hr>
+          <div class="friend-list row"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/friends.js"></script>
+    <script src="js/jquery-1.9.0.js"></script>
+    <script src="js/bootstrap.2.2.2.js"></script>
+    <script type="text/javascript" src="js/underscore.js"></script>
+    <script type="text/javascript" src="js/backbone.js"></script>
+    <script type="text/javascript" src="js/highcharts.js"></script>
+    <script id="friendTmpl" type="text/x-template" charset="utf-8">
+      <div class="media">
+        <a class="pull-left">
+          <img class="media-object" data-src="holder.js/64x64" alt="64x64" style="width: 64px; height: 64px;" src="<%= pic_big %>">
+        </a>
+        <div class="media-body">
+          <h4 class="media-heading"><a href="<%= profile_url %>"><div class="online_presence <%= online_presence %>"></div><%= sort_first_name %> <%= sort_last_name %></a></h4>
+          <% if(relationship_status != null ) { %>
+             <p><i class="icon-heart"></i> <%= relationship_status %></p>
+          <% } %>
+           <% if(birthday != null ) { %>
+             <p><i class="icon-calendar"></i> <%= birthday %></p>
+          <% } %>
+           <% if(current_location != null && current_location.city != null) { %>
+             <p><i class="icon-map-marker"></i> <%= current_location.city %></p>
+          <% } %> 
+       
+        </div>
+      </div>
+    </script>
+    <script type="text/javascript">
+    var FbApp = {};
+
+    </script>
+    <script type="text/javascript" src="charts/ChartModel.js"></script>
+    <script type="text/javascript" src="charts/ChartView.js"></script>
+    <script type="text/javascript" src="charts/ChartAgeModel.js"></script>
+    <script type="text/javascript" src="charts/ChartSexModel.js"></script>
+    <script type="text/javascript" src="charts/ChartRelationshipModel.js"></script>
+    <script type="text/javascript" src="charts/ChartCountryModel.js"></script>
+    <script type="text/javascript" src="app/Friend.js"></script>
+    <script type="text/javascript" src="app/FriendView.js"></script>
+    <script type="text/javascript" src="app/Friends.js"></script>
+    <script type="text/javascript" src="app/FriendsView.js"></script>
+    <script type="text/javascript" src="app/AppView.js"></script>
+    <script type="text/javascript">
+      FbApp.init = function(){
+        // initialisation de la vue
+        var myFriends = new FbApp.Friends();
+        myFriends.reset(getFriends());
+        
+       
+        var myRelationShipChartModel = new FbApp.RelationShipChartModel({
+          collection:myFriends,
+          title:"Relationship Chart"
+        });
+
+        var myRelationShipChartView = new FbApp.ChartView({
+          model:myRelationShipChartModel,
+          el:$('.chart')[0]
+        });
+
+        var mySexChartModel = new FbApp.ChartSexModel({
+          collection:myFriends,
+          title:"Sex Chart"
+        });
+
+        var mySexChartView = new FbApp.ChartView({
+          model:mySexChartModel,
+          el:$('.chart')[0]
+        });
+
+        var myAgeChartModel = new FbApp.ChartAgeModel({
+          collection:myFriends,
+          title:"Age Chart"
+        });
+
+        var myAgeChartView = new FbApp.ChartView({
+          model:myAgeChartModel,
+          el:$('.chart')[0]
+        });
+
+         var myCountryChartModel = new FbApp.ChartCountryModel({
+          collection:myFriends,
+          title:"Country Chart"
+        });
+
+        var myCountryChartView = new FbApp.ChartView({
+          model:myCountryChartModel,
+          el:$('.chart')[0]
+        });
+
+        var myApp = new FbApp.AppView({
+          collection:myFriends,
+          el:$('.app')[0]
+        });
+
+        myApp.relationshipView = myRelationShipChartView;
+        myApp.sexView = mySexChartView;
+        myApp.ageView = myAgeChartView;
+        myApp.countryView = myCountryChartView;
+      };
+      FbApp.init();
+
+      var hide = function(){
+       $("#btnCharts").toggle(500);
+       $("#chart").toggle(500);
+      }
+    </script>
+
+
+  </body>
+</html>
